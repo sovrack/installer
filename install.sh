@@ -82,7 +82,15 @@ POSTGRES_DB=sovrack
 EOF
 fi
 
-# 7. Start Sovrack Service
+# 7. Download Production Compose Manifest
+echo -e "${CYAN}→ Downloading official Sovrack production compose manifest...${NC}"
+curl -fsSL https://raw.githubusercontent.com/sovrack/sovrack/main/infra/docker-compose.prod.yml -o "$SOVRACK_DIR/docker-compose.yml"
+
+# 8. Start Sovrack Containers via Docker Compose
+echo -e "${CYAN}→ Pulling and starting Sovrack services...${NC}"
+docker compose -f "$SOVRACK_DIR/docker-compose.yml" --env-file "$SOVRACK_DIR/.env" pull -q || true
+docker compose -f "$SOVRACK_DIR/docker-compose.yml" --env-file "$SOVRACK_DIR/.env" up -d
+
 echo -e "${GREEN}✓ Sovrack configuration generated at $SOVRACK_DIR/.env${NC}"
 
 PUBLIC_IP=$(curl -s -4 https://ifconfig.me || curl -s -4 https://api.ipify.org || echo "YOUR-SERVER-IP")
